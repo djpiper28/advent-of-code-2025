@@ -6,10 +6,11 @@ import (
 )
 
 type data struct {
-	inputData    []byte
-	index        int
-	dialPosition int
-	numZeros     int
+	inputData       []byte
+	index           int
+	dialPosition    int
+	numZeros        int
+	numZerosAnyTime int
 }
 
 const dialMax = 99
@@ -42,22 +43,47 @@ func (d *data) readNextInstruction() (bool, error) {
 		}
 	}
 
+	leftS := "L"
+	if !left {
+		leftS = "R"
+	}
+
 	if d.current() == '\n' {
 		d.index++
 	}
 
+	old := d.dialPosition
 	if left {
 		d.dialPosition -= num
 	} else {
 		d.dialPosition += num
 	}
 
+	if d.dialPosition == 0 {
+		d.numZerosAnyTime++
+		log.Printf("_; %d, %s%d", d.dialPosition, leftS, num)
+	}
+
 	for d.dialPosition < 0 {
 		d.dialPosition += dialMax + 1
+		if old != 0 {
+			d.numZerosAnyTime++
+			log.Printf("L; %d, %s%d", d.dialPosition, leftS, num)
+		} else {
+			log.Print("Started on zero and went left")
+		}
+		old = d.dialPosition
 	}
 
 	for d.dialPosition > dialMax {
 		d.dialPosition -= dialMax + 1
+		if old != 0 {
+			d.numZerosAnyTime++
+			log.Printf("R; %d, %s%d", d.dialPosition, leftS, num)
+		} else {
+			log.Print("Started on zero and went right")
+		}
+		old = d.dialPosition
 	}
 
 	if d.dialPosition == 0 {
@@ -73,15 +99,15 @@ func main() {
 		log.Fatalf("Cannot read file: %s", err)
 	}
 
-	data := data{
+	numZerosAnyTime := data{
 		inputData:    inputData,
 		dialPosition: 50,
 	}
 
 	for {
-		done, err := data.readNextInstruction()
+		done, err := numZerosAnyTime.readNextInstruction()
 		if err != nil {
-			log.Fatalf("Cannot parse file: %s, data: %v", err, data)
+			log.Fatalf("Cannot parse file: %s, data: %v", err, numZerosAnyTime)
 		}
 
 		if done {
@@ -89,6 +115,7 @@ func main() {
 		}
 	}
 
-	log.Printf("Dial Position: %d", data.dialPosition)
-	log.Printf("Numer of zeros (output): %d", data.numZeros)
+	log.Printf("Dial Position: %d", numZerosAnyTime.dialPosition)
+	log.Printf("Numer of zeros (part 1 output): %d", numZerosAnyTime.numZeros)
+	log.Printf("Numer of zeros at any time (part 2 output): %d", numZerosAnyTime.numZerosAnyTime)
 }
