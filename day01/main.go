@@ -29,61 +29,42 @@ func (d *data) readNextInstruction() (bool, error) {
 
 	for ; d.index < len(d.inputData) && d.current() != '\n'; d.index++ {
 		switch d.current() {
-		case 'l':
-			fallthrough
-		case 'L':
+		case 'L', 'l':
 			left = true
-		case 'r':
-			fallthrough
-		case 'R':
+		case 'R', 'r':
 			left = false
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 			num *= 10
 			num += int(d.current() - '0')
+    default:
+      log.Fatalf("Cannot parse char %c", d.current())
 		}
-	}
-
-	leftS := "L"
-	if !left {
-		leftS = "R"
 	}
 
 	if d.current() == '\n' {
 		d.index++
 	}
 
-	old := d.dialPosition
 	if left {
-		d.dialPosition -= num
+		for range num {
+			d.dialPosition--
+			if d.dialPosition == 0 {
+				d.numZerosAnyTime++
+			}
+
+			if d.dialPosition < 0 {
+				d.dialPosition = dialMax
+			}
+		}
 	} else {
-		d.dialPosition += num
-	}
+		for range num {
+			d.dialPosition++
 
-	if d.dialPosition == 0 {
-		d.numZerosAnyTime++
-		log.Printf("_; %d, %s%d", d.dialPosition, leftS, num)
-	}
-
-	for d.dialPosition < 0 {
-		d.dialPosition += dialMax + 1
-		if old != 0 {
-			d.numZerosAnyTime++
-			log.Printf("L; %d, %s%d", d.dialPosition, leftS, num)
-		} else {
-			log.Print("Started on zero and went left")
+			if d.dialPosition > dialMax {
+				d.dialPosition = 0
+				d.numZerosAnyTime++
+			}
 		}
-		old = d.dialPosition
-	}
-
-	for d.dialPosition > dialMax {
-		d.dialPosition -= dialMax + 1
-		if old != 0 {
-			d.numZerosAnyTime++
-			log.Printf("R; %d, %s%d", d.dialPosition, leftS, num)
-		} else {
-			log.Print("Started on zero and went right")
-		}
-		old = d.dialPosition
 	}
 
 	if d.dialPosition == 0 {
