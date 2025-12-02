@@ -22,6 +22,10 @@ func isInvalidPart1(id int64) bool {
 func addInvalidIdsPart1(ids [2]int64) int64 {
 	var ret int64
 	for id := ids[0]; id <= ids[1]; id++ {
+    if id < 10 {
+      continue
+    }
+
 		if isInvalidPart1(id) {
 			log.Printf("Invalid ID: %d", id)
 			ret += id
@@ -81,6 +85,10 @@ func isInvalidPart2(id int64) bool {
 func addInvalidIdsPart2(ids [2]int64) int64 {
 	var ret int64
 	for id := ids[0]; id <= ids[1]; id++ {
+    if id < 10 {
+      continue
+    }
+
 		if isInvalidPart2(id) {
 			ret += id
 		}
