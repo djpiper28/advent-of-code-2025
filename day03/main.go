@@ -95,7 +95,6 @@ func main() {
 		safeSum += val
 
 		val = bank.MaximumUnsafeJoltage()
-		log.Printf("Found Unsafe %d", val)
 		unsafeSum += val
 	}
 

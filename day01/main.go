@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 )
 
 type data struct {
@@ -80,6 +81,7 @@ func main() {
 		log.Fatalf("Cannot read file: %s", err)
 	}
 
+  t := time.Now()
 	numZerosAnyTime := data{
 		inputData:    inputData,
 		dialPosition: 50,
@@ -99,4 +101,5 @@ func main() {
 	log.Printf("Dial Position: %d", numZerosAnyTime.dialPosition)
 	log.Printf("Numer of zeros (part 1 output): %d", numZerosAnyTime.numZeros)
 	log.Printf("Numer of zeros at any time (part 2 output): %d", numZerosAnyTime.numZerosAnyTime)
+  log.Printf("Time taken: %s", time.Since(t))
 }

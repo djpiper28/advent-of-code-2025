@@ -27,7 +27,7 @@ func addInvalidIdsPart1(ids [2]int64) int64 {
     }
 
 		if isInvalidPart1(id) {
-			log.Printf("Invalid ID: %d", id)
+			// log.Printf("Invalid ID: %d", id)
 			ret += id
 		}
 	}
@@ -48,7 +48,7 @@ func isInvalidPart2(id int64) bool {
 	}
 
 	if eq {
-		log.Printf("Invalid Id Factor: 1, Id: %d", id)
+		// log.Printf("Invalid Id Factor: 1, Id: %d", id)
 		return true
 	}
 
@@ -74,7 +74,7 @@ func isInvalidPart2(id int64) bool {
 		}
 
 		if eq {
-			log.Printf("Invalid Id Factor: %d, Part: %s, Id: %d", factor, parts[0], id)
+			// log.Printf("Invalid Id Factor: %d, Part: %s, Id: %d", factor, parts[0], id)
 			return true
 		}
 	}
@@ -129,7 +129,7 @@ func main() {
 		}
 	}
 
-	log.Printf("Time: %s", time.Since(t))
 	log.Printf("Part one answer: %d", part1Acc)
 	log.Printf("Part two answer: %d", part2Acc)
+	log.Printf("Time: %s", time.Since(t))
 }
