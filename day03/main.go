@@ -42,6 +42,32 @@ func (b *Bank) MaximumJoltage() int {
 	return left*10 + right
 }
 
+func (b *Bank) MaximumUnsafeJoltage() int {
+	const usableCells = 12
+	acc := 0
+
+	index := -1
+	for cellNumber := range usableCells {
+		maxLocalJoltage := -1
+		for j := index + 1; j <= len(b.Cells)+cellNumber-usableCells; j++ {
+			joltage := b.Cells[j]
+			if joltage > maxLocalJoltage {
+				maxLocalJoltage = joltage
+				index = j
+			}
+
+			if joltage >= 9 {
+				break
+			}
+		}
+
+		acc *= 10
+		acc += maxLocalJoltage
+	}
+
+	return acc
+}
+
 func main() {
 	bytes, err := os.ReadFile("./input.txt")
 	if err != nil {
@@ -62,13 +88,18 @@ func main() {
 		}
 	}
 
-	sum := 0
+	safeSum := 0
+	unsafeSum := 0
 	for _, bank := range banks {
 		val := bank.MaximumJoltage()
-		log.Printf("Found %d", val)
-		sum += val
+		safeSum += val
+
+		val = bank.MaximumUnsafeJoltage()
+		log.Printf("Found Unsafe %d", val)
+		unsafeSum += val
 	}
 
-  log.Printf("Part one answer: %d", sum)
+	log.Printf("Part one answer: %d", safeSum)
+	log.Printf("Part two answer: %d", unsafeSum)
 	log.Printf("Time taken: %s", time.Since(t))
 }
