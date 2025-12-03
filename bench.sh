@@ -2,7 +2,7 @@
 
 function bench() {
   pushd "$1" && go build && ./day*
-  popd
+  popd || exit 1
 }
 
 for d in day*; do
