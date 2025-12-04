@@ -45,6 +45,28 @@ func (g *Grid) Part1() int {
 	return count
 }
 
+func (g *Grid) Part2() int {
+	count := 0
+	dirty := true
+	for dirty {
+		dirty = false
+
+		for y := 0; y < len(g.Grid); y++ {
+			for x := 0; x < len(g.Grid[y]); x++ {
+				if g.Grid[y][x] {
+					if g.CountNeighbours(x, y) < 4 {
+						g.Grid[y][x] = false
+						count++
+						dirty = true
+					}
+				}
+			}
+		}
+	}
+
+	return count
+}
+
 func main() {
 	bytes, err := os.ReadFile("./input.txt")
 	if err != nil {
@@ -70,5 +92,6 @@ func main() {
 	}
 
 	log.Printf("Part one answer: %d", grid.Part1())
+	log.Printf("Part two answer: %d", grid.Part2())
 	log.Printf("Time taken: %s", time.Since(t))
 }
