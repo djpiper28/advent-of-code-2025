@@ -12,17 +12,14 @@ type Grid struct {
 }
 
 func (g *Grid) CountNeighbours(xPos, yPos int) int {
-	sum := 0
+	// xPos, yPos is always iterated over
+	sum := -1
 
-	for y := yPos - 1; y <= yPos+1; y++ {
-		for x := xPos - 1; x <= xPos+1; x++ {
-			if x == xPos && y == yPos {
-				continue
-			} else if y < 0 || x < 0 {
-				continue
-			} else if y >= len(g.Grid) || x >= len(g.Grid[y]) {
-				continue
-			} else if g.Grid[y][x] {
+	yMax := min(yPos+1, len(g.Grid)-1)
+	xMax := min(xPos+1, len(g.Grid[0])-1)
+	for y := max(0, yPos-1); y <= yMax; y++ {
+		for x := max(0, xPos-1); x <= xMax; x++ {
+			if g.Grid[y][x] {
 				sum++
 			}
 		}
@@ -77,26 +74,16 @@ func (g *Grid) fastPart2R(xPos, yPos int) int {
 	g.Grid[yPos][xPos] = false
 
 	// All of the neighbours have one less now
-	for y := yPos - 1; y <= yPos+1; y++ {
-		for x := xPos - 1; x <= xPos+1; x++ {
-			if y < 0 || x < 0 {
-				continue
-			} else if y >= len(g.Grid) || x >= len(g.Grid[y]) {
-				continue
-			}
-
+	yMax := min(yPos+1, len(g.Grid)-1)
+	xMax := min(xPos+1, len(g.Grid[0])-1)
+	for y := max(0, yPos-1); y <= yMax; y++ {
+		for x := max(0, xPos-1); x <= xMax; x++ {
 			g.CountGrid[y][x]--
 		}
 	}
 
-	for y := yPos - 1; y <= yPos+1; y++ {
-		for x := xPos - 1; x <= xPos+1; x++ {
-			if y < 0 || x < 0 {
-				continue
-			} else if y >= len(g.Grid) || x >= len(g.Grid[y]) {
-				continue
-			}
-
+	for y := max(0, yPos-1); y <= yMax; y++ {
+		for x := max(0, xPos-1); x <= xMax; x++ {
 			if g.Grid[y][x] {
 				sum += g.fastPart2R(x, y)
 			}
@@ -108,10 +95,12 @@ func (g *Grid) fastPart2R(xPos, yPos int) int {
 func (g *Grid) FastPart2() int {
 	g.CountGrid = make([][]int, len(g.Grid))
 
-	for y := 0; y < len(g.Grid); y++ {
+	yLen := len(g.Grid)
+	xLen := len(g.Grid[0])
+	for y := range yLen {
 		g.CountGrid[y] = make([]int, len(g.Grid[y]))
 
-		for x := 0; x < len(g.Grid[y]); x++ {
+		for x := range xLen {
 			if g.Grid[y][x] {
 				g.CountGrid[y][x] = g.CountNeighbours(x, y)
 			}
@@ -120,8 +109,8 @@ func (g *Grid) FastPart2() int {
 
 	sum := 0
 
-	for y := 0; y < len(g.CountGrid); y++ {
-		for x := 0; x < len(g.CountGrid[y]); x++ {
+	for y := range yLen {
+		for x := range xLen {
 			if g.Grid[y][x] {
 				sum += g.fastPart2R(x, y)
 			}
@@ -131,16 +120,7 @@ func (g *Grid) FastPart2() int {
 	return sum
 }
 
-func main() {
-	bytes, err := os.ReadFile("./input.txt")
-	if err != nil {
-		log.Fatalf("Cannot read input: %s", err)
-	}
-
-	t := time.Now()
-
-	// grid[y][x]
-	var grid Grid
+func (grid *Grid) parse(bytes []byte) {
 	var row []bool
 	for i, c := range bytes {
 		if c == '\n' || i == len(bytes)-1 {
@@ -154,6 +134,19 @@ func main() {
 			log.Fatalf("Invalid char '%c'", c)
 		}
 	}
+}
+
+func main() {
+	bytes, err := os.ReadFile("./input.txt")
+	if err != nil {
+		log.Fatalf("Cannot read input: %s", err)
+	}
+
+	t := time.Now()
+
+	// grid[y][x]
+	var grid Grid
+	grid.parse(bytes)
 
 	log.Printf("Part one answer: %d", grid.Part1())
 	// log.Printf("Part two answer: %d", grid.Part2())
@@ -166,19 +159,7 @@ func main() {
 
 	for range tries {
 		var grid Grid
-		var row []bool
-		for i, c := range bytes {
-			if c == '\n' || i == len(bytes)-1 {
-				grid.Grid = append(grid.Grid, row)
-				row = make([]bool, 0)
-			} else if c == '@' {
-				row = append(row, true)
-			} else if c == '.' {
-				row = append(row, false)
-			} else {
-				log.Fatalf("Invalid char '%c'", c)
-			}
-		}
+		grid.parse(bytes)
 
 		x := grid.FastPart2()
 		if x != 8899 {
@@ -193,19 +174,7 @@ func main() {
 
 	for range tries {
 		var grid Grid
-		var row []bool
-		for i, c := range bytes {
-			if c == '\n' || i == len(bytes)-1 {
-				grid.Grid = append(grid.Grid, row)
-				row = make([]bool, 0)
-			} else if c == '@' {
-				row = append(row, true)
-			} else if c == '.' {
-				row = append(row, false)
-			} else {
-				log.Fatalf("Invalid char '%c'", c)
-			}
-		}
+		grid.parse(bytes)
 
 		x := grid.Part2()
 		if x != 8899 {
