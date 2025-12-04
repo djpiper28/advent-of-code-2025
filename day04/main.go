@@ -68,6 +68,45 @@ func (g *Grid) Part2() int {
 	return count
 }
 
+func (g *Grid) fastPart2R(xPos, yPos int) int {
+	if !g.Grid[yPos][xPos] {
+		return 0
+	}
+
+	if g.CountGrid[yPos][xPos] >= 4 {
+		return 0
+	}
+
+	sum := 1
+	g.Grid[yPos][xPos] = false
+
+	// All of the neighbours have one less now
+	for y := yPos - 1; y <= yPos+1; y++ {
+		for x := xPos - 1; x <= xPos+1; x++ {
+			if y < 0 || x < 0 {
+				continue
+			} else if y >= len(g.Grid) || x >= len(g.Grid[y]) {
+				continue
+			}
+
+			g.CountGrid[y][x]--
+		}
+	}
+
+	for y := yPos - 1; y <= yPos+1; y++ {
+		for x := xPos - 1; x <= xPos+1; x++ {
+			if y < 0 || x < 0 {
+				continue
+			} else if y >= len(g.Grid) || x >= len(g.Grid[y]) {
+				continue
+			}
+
+			sum += g.fastPart2R(x, y)
+		}
+	}
+	return sum
+}
+
 func (g *Grid) FastPart2() int {
 	g.CountGrid = make([][]int, len(g.Grid))
 
@@ -81,41 +120,15 @@ func (g *Grid) FastPart2() int {
 		}
 	}
 
-	count := 0
-	dirty := true
+	sum := 0
 
-	for dirty {
-		dirty = false
-
-		for yPos := 0; yPos < len(g.CountGrid); yPos++ {
-			for xPos := 0; xPos < len(g.CountGrid[yPos]); xPos++ {
-				if !g.Grid[yPos][xPos] {
-					continue
-				}
-
-				if g.CountGrid[yPos][xPos] < 4 {
-					g.Grid[yPos][xPos] = false
-					count++
-					dirty = true
-
-					// All of the neighbours have one less now
-					for y := yPos - 1; y <= yPos+1; y++ {
-						for x := xPos - 1; x <= xPos+1; x++ {
-							if y < 0 || x < 0 {
-								continue
-							} else if y >= len(g.Grid) || x >= len(g.Grid[y]) {
-								continue
-							}
-
-							g.CountGrid[y][x]--
-						}
-					}
-				}
-			}
+	for yPos := 0; yPos < len(g.CountGrid); yPos++ {
+		for xPos := 0; xPos < len(g.CountGrid[yPos]); xPos++ {
+			sum += g.fastPart2R(xPos, yPos)
 		}
 	}
 
-	return count
+	return sum
 }
 
 func main() {
