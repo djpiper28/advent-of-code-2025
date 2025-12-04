@@ -125,13 +125,9 @@ func (grid *Grid) parse(bytes []byte) {
 	for i, c := range bytes {
 		if c == '\n' || i == len(bytes)-1 {
 			grid.Grid = append(grid.Grid, row)
-			row = make([]bool, 0)
-		} else if c == '@' {
-			row = append(row, true)
-		} else if c == '.' {
-			row = append(row, false)
+			row = make([]bool, 0, 150)
 		} else {
-			log.Fatalf("Invalid char '%c'", c)
+			row = append(row, c == '@')
 		}
 	}
 }
