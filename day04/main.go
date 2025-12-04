@@ -122,9 +122,11 @@ func (g *Grid) FastPart2() int {
 
 	sum := 0
 
-	for yPos := 0; yPos < len(g.CountGrid); yPos++ {
-		for xPos := 0; xPos < len(g.CountGrid[yPos]); xPos++ {
-			sum += g.fastPart2R(xPos, yPos)
+	for y := 0; y < len(g.CountGrid); y++ {
+		for x := 0; x < len(g.CountGrid[y]); x++ {
+			if g.Grid[y][x] {
+				sum += g.fastPart2R(x, y)
+			}
 		}
 	}
 
