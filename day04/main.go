@@ -159,4 +159,27 @@ func main() {
 	// log.Printf("Part two answer: %d", grid.Part2())
 	log.Printf("Part two (fast) answer: %d", grid.FastPart2())
 	log.Printf("Time taken: %s", time.Since(t))
+
+	const tries = 10000
+	log.Printf("Running fast part 2 %d times", tries)
+	t = time.Now()
+
+	for range tries {
+		var grid Grid
+		var row []bool
+		for i, c := range bytes {
+			if c == '\n' || i == len(bytes)-1 {
+				grid.Grid = append(grid.Grid, row)
+				row = make([]bool, 0)
+			} else if c == '@' {
+				row = append(row, true)
+			} else if c == '.' {
+				row = append(row, false)
+			} else {
+				log.Fatalf("Invalid char '%c'", c)
+			}
+		}
+	}
+
+	log.Printf("Time taken: %s", time.Since(t)/tries)
 }
