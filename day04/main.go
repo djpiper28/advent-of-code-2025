@@ -69,10 +69,6 @@ func (g *Grid) Part2() int {
 }
 
 func (g *Grid) fastPart2R(xPos, yPos int) int {
-	if !g.Grid[yPos][xPos] {
-		return 0
-	}
-
 	if g.CountGrid[yPos][xPos] >= 4 {
 		return 0
 	}
@@ -101,7 +97,9 @@ func (g *Grid) fastPart2R(xPos, yPos int) int {
 				continue
 			}
 
-			sum += g.fastPart2R(x, y)
+			if g.Grid[y][x] {
+				sum += g.fastPart2R(x, y)
+			}
 		}
 	}
 	return sum
