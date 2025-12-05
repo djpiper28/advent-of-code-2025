@@ -1,0 +1,36 @@
+package main
+
+import "log"
+
+type parser Peg {
+  Ranges []Range
+  Items  []int
+  num    int
+  tmpRange Range
+}
+
+Grammer <- Ranges NewLine+ Items NewLine* EndOfFile
+
+NewLine <- ' '* ('\n' / '\r\n')
+
+Number <- < [0-9]+ > {
+  num, err := strconv.Atoi(text)
+  if err != nil {
+    log.Fatalf("Invalid input, cannot read '%s': %s", text, err)
+  }
+
+  p.num = num
+}
+
+Range <- Number {p.tmpRange.Low = p.num} '-' Number {
+  p.tmpRange.High = p.num
+  p.Ranges = append(p.Ranges, p.tmpRange)
+}
+
+Ranges <- Range NewLine Ranges / Range 
+
+Item <- Number {p.Items = append(p.Items, p.num)}
+
+Items <- Item NewLine Items / Item
+
+EndOfFile <- !.
