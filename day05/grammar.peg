@@ -3,10 +3,11 @@ package main
 import "log"
 
 type parser Peg {
-  Ranges []Range
-  Items  []int
-  num    int
-  tmpRange Range
+  Ranges       []Range
+	MergedRanges []*Range
+  Items        []int
+  num          int
+  tmpRange     Range
 }
 
 Grammer <- Ranges NewLine+ Items NewLine* EndOfFile
