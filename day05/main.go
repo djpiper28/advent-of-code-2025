@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"sort"
 	"time"
 )
 
@@ -25,42 +26,35 @@ func (p *parser) Part1() int {
 	return count
 }
 
-func (p *parser) Insert(rnge *Range) {
-	for i, mergedRange := range p.MergedRanges {
-		if rnge.Low >= mergedRange.Low && rnge.Low <= mergedRange.High {
-			/*
-			        |--------------| a
-			   |--------------|      merged
-			*/
-		} else if rnge.High <= mergedRange.High && rnge.High >= mergedRange.Low {
-			/*
-			   |--------------|     a
-			       |--------------| merged
-			*/
-		} else {
-			continue
-		}
-
-		mergedRange.Low = min(mergedRange.Low, rnge.Low)
-		mergedRange.High = max(mergedRange.High, rnge.High)
-
-		// Check for new overlapping range
-		p.MergedRanges = p.MergedRanges[0:i]
-		if i < len(p.MergedRanges) {
-			p.MergedRanges = append(p.MergedRanges, p.MergedRanges[i+1:]...)
-		}
-
-		p.Insert(mergedRange)
-		return
-	}
-
-	p.MergedRanges = append(p.MergedRanges, rnge)
+func (p *parser) Insert(rnge Range) {
+	p.MergedRanges = append(p.MergedRanges, &rnge)
 }
 
 func (p *parser) Part2() int {
 	for _, rnge := range p.Ranges {
-		p.Insert(&rnge)
+		p.Insert(rnge)
 	}
+
+	sort.Slice(p.MergedRanges, func(i, j int) bool {
+		return p.MergedRanges[i].Low < p.MergedRanges[j].Low
+	})
+
+	var mergedRanges []*Range
+	if len(p.MergedRanges) > 0 {
+		mergedRanges = append(mergedRanges, p.MergedRanges[0])
+	}
+
+	for i := 1; i < len(p.MergedRanges); i++ {
+		lastMerged := mergedRanges[len(mergedRanges)-1]
+		current := p.MergedRanges[i]
+
+		if current.Low <= lastMerged.High {
+			lastMerged.High = max(lastMerged.High, current.High) // Using built-in max
+		} else {
+			mergedRanges = append(mergedRanges, current)
+		}
+	}
+	p.MergedRanges = mergedRanges
 
 	sum := 0
 	for _, rnge := range p.MergedRanges {
