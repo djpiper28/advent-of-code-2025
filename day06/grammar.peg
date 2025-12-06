@@ -1,0 +1,41 @@
+package main
+
+import "log"
+
+type parser Peg {
+  num          int
+  tempRow      []int
+  Numbers      [][]int
+  Operators    []Operator
+}
+
+Grammer <- Rows NewLine Operators WhiteSpace? NewLine* EndOfFile
+
+NewLine <- ' '* ('\n' / '\r\n')
+
+WhiteSpace <- ' '+
+
+Number <- < [0-9]+ > {
+  num, err := strconv.Atoi(text)
+  if err != nil {
+    log.Fatalf("Invalid input, cannot read '%s': %s", text, err)
+  }
+
+  p.num = num
+}
+
+Row <- Number { p.tempRow = append(p.tempRow, p.num) } WhiteSpace Row /
+       Number { p.tempRow = append(p.tempRow, p.num) }
+
+Rows <- { p.tempRow = make([]int, 0) } WhiteSpace? 
+        (
+          Row { p.Numbers = append(p.Numbers, p.tempRow) } WhiteSpace? NewLine Rows /
+          Row { p.Numbers = append(p.Numbers, p.tempRow) } WhiteSpace?
+        )
+
+Operator <- '+' { p.Operators = append(p.Operators, Operator_Addition) } /
+            '*' { p.Operators = append(p.Operators, Operator_Multiplication) }
+
+Operators <- Operator WhiteSpace Operators / Operator
+
+EndOfFile <- !.
